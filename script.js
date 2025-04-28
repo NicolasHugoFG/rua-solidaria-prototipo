@@ -14,7 +14,7 @@ const form = document.getElementById('formDoacao');
 const mensagem = document.getElementById('mensagemResultado');
 
 // Substitua pelo seu link do Google Apps Script!
-const googleScriptURL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyqhx-lQezo_bzb3o0nLuHNbpUPE4seydI8veT4RulX_-DXh4O7X_1I6pb_TnSihGSnIA/exec/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyqhx-lQezo_bzb3o0nLuHNbpUPE4seydI8veT4RulX_-DXh4O7X_1I6pb_TnSihGSnIA/exec/exec';
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
