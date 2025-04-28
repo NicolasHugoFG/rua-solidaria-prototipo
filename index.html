@@ -3,150 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rua Solidária - Plataforma de Doações</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, #e0f7fa, #ffffff);
-    }
-    header {
-      background: linear-gradient(to right, #0077cc, #005fa3);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-    }
-    header img {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      height: 80px;
-    }
-    nav {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    nav button {
-      background-color: white;
-      color: #0077cc;
-      border: 2px solid #0077cc;
-      padding: 10px 20px;
-      margin: 10px;
-      cursor: pointer;
-      border-radius: 30px;
-      font-size: 16px;
-      transition: background 0.3s, color 0.3s;
-    }
-    nav button:hover {
-      background-color: #0077cc;
-      color: white;
-    }
-    section {
-      padding: 40px;
-      text-align: center;
-      animation: fadeIn 1s ease;
-    }
-    .pix-info, .impacto-info {
-      margin-top: 30px;
-      background: white;
-      padding: 20px;
-      display: inline-block;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    ul li {
-      background: #e0f7fa;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    footer {
-      background: linear-gradient(to right, #0077cc, #005fa3);
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 30px;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @media (max-width: 600px) {
-      nav button {
-        width: 80%;
-      }
-      .pix-info, .impacto-info {
-        width: 90%;
-      }
-    }
-  </style>
+  <title>Rua Solidária - Doações</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <img src="/mnt/data/ChatGPT Image Apr 17, 2025, 10_32_06 AM.png" alt="Rua Solidária">
   <h1>Rua Solidária</h1>
-  <p>Transforme sua solidariedade em esperança para quem mais precisa</p>
+  <p>Ajude quem mais precisa. Doe via PIX!</p>
 </header>
 
-<nav>
-  <button onclick="mostrarDoacao()">Doar Agora</button>
-  <button onclick="mostrarImpacto()">Ver Impacto</button>
-</nav>
+<main>
+  <section>
+    <h2>Faça sua doação</h2>
+    <img src="IMG_20250427_233716.npg" alt="QR Code para doação" width="200"> <!-- coloque a imagem real do seu QR aqui -->
+    <p><strong>Chave PIX:</strong> solidariarua@gmail.com</p>
+    <hr>
 
-<section id="conteudo">
-  <h2>Bem-vindo(a)!</h2>
-  <p>Em cada gesto de solidariedade nasce uma nova chance de transformação. Nosso objetivo é arrecadar recursos financeiros para levar alimentos, roupas e dignidade às pessoas em situação de rua. Com a sua ajuda, podemos construir um caminho de esperança para quem tanto precisa.</p>
-</section>
-
-<section id="doacao" style="display:none;">
-  <div class="pix-info">
-    <h2>Realize sua Doação</h2>
-    <p>Use a chave PIX:</p>
-    <p><strong>solidariarua.com.br</strong></p>
-    <p>Ou escaneie o QR Code:</p>
-    <img src="00020126440014BR.GOV.BCB.PIX0122solidariarua@gmail.com5204000053039865802BR5923DEBORA RIBEIRO DA SILVA6015JABOATAO DOS GU62250521rD00lWwACgXAvY3vf7ZbC6304FC31" alt="QR Code PIX" width="200">
-  </div>
-</section>
-
-<section id="impacto" style="display:none;">
-  <div class="impacto-info">
-    <h2>Impacto das Doações</h2>
-    <p>Graças a você, já alcançamos:</p>
-    <ul>
-      <li>🍲 500 marmitas distribuídas</li>
-      <li>💉 200 kits de higiene entregues</li>
-      <li>👕 300 roupas de frio doadas</li>
-    </ul>
-    <p>Juntos, seguimos transformando vidas!</p>
-  </div>
-</section>
+    <h3>Informe que doou:</h3>
+    <form id="formDoacao">
+      <input type="number" id="valor" placeholder="Digite o valor doado (R$)" required><br><br>
+      <button type="submit">Confirmar Doação</button>
+    </form>
+    <div id="mensagemResultado"></div>
+  </section>
+</main>
 
 <footer>
-  &copy; 2025 Rua Solidária. Todos os direitos reservados.
+  &copy; 2025 Rua Solidária
 </footer>
 
-<script>
-function mostrarDoacao() {
-  document.getElementById('conteudo').style.display = 'none';
-  document.getElementById('impacto').style.display = 'none';
-  document.getElementById('doacao').style.display = 'block';
-}
-
-function mostrarImpacto() {
-  document.getElementById('conteudo').style.display = 'none';
-  document.getElementById('doacao').style.display = 'none';
-  document.getElementById('impacto').style.display = 'block';
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
