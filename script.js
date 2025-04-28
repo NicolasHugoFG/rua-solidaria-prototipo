@@ -20,7 +20,7 @@ function voltarInicio() {
 // Submissão da doação
 const form = document.getElementById('formDoacao');
 const mensagem = document.getElementById('mensagemResultado');
-const googleScriptURL = 'https://script.google.com/macros/s/SEU-LINK-AQUI/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzYobdMZJK2gO2zxO3u1e3ID_vACuFj7MiwQg109CEveGzguTihB1moBQjd6ur4RDU1hw/exec';
 
 if (form) {
   form.addEventListener('submit', async (e) => {
