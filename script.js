@@ -20,7 +20,7 @@ function voltarInicio() {
 // Submissão da doação
 const form = document.getElementById('formDoacao');
 const mensagem = document.getElementById('mensagemResultado');
-const googleScriptURL = 'http://localhost/http:/rua-solidaria-ultravisual/index.html/registrar_doacao.php';
+const googleScriptURL = 'http://localhost/rua-solidaria-ultravisual/registrar_doacao.php';
 ';
 
 if (form) {
