@@ -43,3 +43,14 @@ Este projeto está sob licença MIT — sinta-se livre para usar, modificar e co
 ✨Faça parte dessa transformação!
 Cada doação ajuda a transformar a realidade de quem mais precisa.
 Doe, compartilhe e espalhe esperança! 💙
+
+--------- BUILD -----------
+start db:
+mysql -u root -p < create_db.sql
+
+start the server:
+npm i
+node server.js
+
+see db:
+php -S localhost:8080 adminer-5.2.1.php
