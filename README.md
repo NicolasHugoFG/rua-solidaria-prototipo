@@ -1,56 +1,39 @@
-Rua Solidária é uma plataforma digital simples e acessível, desenvolvida para arrecadar doações financeiras que serão convertidas em recursos essenciais (como alimentos, roupas e itens de higiene) para pessoas em situação de rua.
+🛣️ Rua Solidária
+Um projeto de site voltado à arrecadação de doações para pessoas em situação de vulnerabilidade social. Com design simples, mensagem humanitária e registro de impacto social, o sistema permite que qualquer pessoa doe com facilidade.
 
-O projeto foi criado para facilitar a solidariedade, permitindo que qualquer pessoa possa colaborar rapidamente via chave PIX ou QR Code.
+🌟 Funcionalidades
+Página inicial com mensagem de impacto social
+Animações suaves e layout responsivo
+Botão para realizar doações via PIX (com QR Code)
+Formulário para registrar o valor doado
+Seção de impacto: número de pessoas beneficiadas, marmitas doadas, valor arrecadado
+Integração com backend PHP (localhost) para salvar registros
+🖥️ Tecnologias Utilizadas
+HTML5 — estrutura da página
+CSS3 — estilo com gradientes e animações
+JavaScript — controle da navegação e envio de dados
+PHP — registro dos dados da doação (localmente)
+XAMPP — servidor local para testes
+📁 Estrutura de Arquivos
+📦 rua_solidaria ┣ 📄 index.html ┣ 📄 style.css ┣ 📄 script.js ┣ 📄 registrar_doacao.php ┣ 📄 imagens (como QR Code e logo) ┗ 📄 README.md
 
-🚀 Funcionalidades
-Página inicial com informações sobre o projeto e objetivo social.
+🚀 Como Executar Localmente
+Clone o repositório:
 
-Botão para "Doar Agora" exibindo a chave PIX e QR Code para doação.
+git clone https://github.com/Debyrs2/Prototipo-rua-solidaria.git
+Coloque uma pasta no diretório htdocsdo XAMPP:
 
-Botão para "Ver Impacto" , exibindo resultados oferecidos com as doações.
+http://localhost/rua_solidaria
 
-Interface moderna, leve, responsiva e com animações suaves.
+Início do XAMPP (Apache + MySQL)
 
-🛠️ Tecnologias utilizadas
-HTML5 – Estrutura da página
+Acesse no navegador: http://localhost/rua_solidaria
 
-CSS3 – Design visual, animações e responsividade
+Faça uma simulação de ação para ver o funcionamento
 
-JavaScript – Controle de navegação entre as seleções sem recarregar a página
+📬 Contato Caso deseje contribuir com o projeto ou sugestão de melhorias, entre em contato:
 
-🌐 Como acessar
-O projeto está publicado através do GitHub Pages:
-👉 Clique aqui para acessar (substitua pelo seu link real quando publicar!)
-
-📦 Como rodar localmente
-Clone ou repositório:
-
-festança
-
-Cópia
-
-Editar
-git clone https://github.com/seu-usuario/rua-solidaria.git
-Abra o arquivo index.htmlno seu navegador.
-
-🤝 Contribuições
-Contribuições são bem-vindas!
-Sinta-se à vontade para enviar sugestões ou melhorias através de Pull Requests.
-
-📜 Licença
-Este projeto está sob licença MIT — sinta-se livre para usar, modificar e compartilhar!
-
-✨Faça parte dessa transformação!
-Cada doação ajuda a transformar a realidade de quem mais precisa.
-Doe, compartilhe e espalhe esperança! 💙
-
+📧 debii.ribeiro@gmail.com
 --------- BUILD -----------
-start db:
-mysql -u root -p < create_db.sql
-
-start the server:
-npm i
-node server.js
-
-see db:
-php -S localhost:8080 adminer-5.2.1.php
+#db running at port 3308
+npx tsx server.ts
