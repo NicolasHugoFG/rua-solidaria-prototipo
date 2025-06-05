@@ -1,0 +1,26 @@
+<div  id="top-nav", class="header-container fade-in">
+    <a href="#" onclick="return_to_home(); return false">
+    <img
+      src="/imgs/LogoRuaSolidariaPNG.png"
+      alt="Logo Rua Solidária"
+      class="logo"
+        />
+    </a>
+    <div class="titulo">
+      <h1>RUA SOLIDÁRIA</h1>
+      <p>Transforme doações em esperança e dignidade!</p>
+    </div>
+        <% if (account && profile) { %>
+        <div id="login_sign" class="fade-in">
+        <a href="#" onclick="mostrar_conta( '<%= "/perfis/usuarios/"+ account.id_outro %>' ); return false"><%= account.username%>
+            <img src=<%= "/imgs" + profile.picture%> width="32" height="32" alt="Default Image" />
+            </a>
+        </div>
+    <% } else { %>
+      <div id="login_sign" class="fade-in">
+        <a href="#" onclick="mostrar_login(); return false;">Login</a>
+        /
+        <a href="#" onclick="mostrar_signin(); return false;">Sign-In</a>
+      </div>
+    <% } %>
+</div>  

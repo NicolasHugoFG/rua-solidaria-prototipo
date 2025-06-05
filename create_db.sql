@@ -98,7 +98,4 @@ VALUES ("pao_dos_pobres", "senha", "relacaoinstitucional@paodospobres.com.br", 2
 INSERT INTO doacoes(user_id, instituicao_id, valor)
 VALUES (1, 1, 0.75);
 
-INSERT INTO profile(description, picture, email_publico) VALUES("","/profile.png","");
-INSERT INTO users (name, tipo, profile_id) VALUES ('${username}', 1, LAST_INSERT_ID());
-INSERT INTO account (username, email, password, tipo, id_outro ) VALUES (${username}, ${email}, ${password}, 1, LAST_INSERT_ID());
 

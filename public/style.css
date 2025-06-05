@@ -1,6 +1,10 @@
 :root {
   --bs-body-color: #000000 !important;
 }
+body > * {
+  opacity: 0;
+  animation: fadeIn 300ms ease-in forwards;
+}
 
 header {
   background: linear-gradient(to right, #005fa3, #003366);
@@ -548,4 +552,64 @@ body {
   border-radius: 8px;
   flex: 1; /* equal width */
   text-align: center;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #f1f1f1;
+  text-align: center;
+  padding: 10px;
+  left: 0;
+}
+
+#valores-arrecadados {
+  --bs-body-color: #acffbf !important;
+}
+
+/* main { */
+/*   background-color: #fff; */
+/*   border-radius: 16px; */
+/*   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+/*   padding: 32px; */
+/*   width: 350px; */
+/*   text-align: center; */
+/* } */
+
+.profile-pic-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+}
+
+.edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+}
+
+.donated {
+  font-weight: bold;
+  color: #2e8b57;
+  font-size: 1.2rem;
 }

@@ -1,0 +1,58 @@
+<main id="main-content">
+  <section id="login" class="login-page fade-in">
+    <div class="container">
+      <div class="login-container">
+        <div class="text-center mb-4">
+          <i
+            class="bi bi-person-circle"
+            style="font-size: 3rem; color: #4e73df"
+          ></i>
+          <h2 class="mt-2">Login</h2>
+        </div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email_login"
+              name="email"
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Senha</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password_login"
+              name="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div class="d-grid mb-3">
+            <button onclick="login_form()" class="btn-login">
+              Entrar
+              <!-- <i class="bi bi-box-arrow-in-right me-2"></i> Entrar -->
+            </button>
+          </div>
+
+          <div class="text-center">
+            <a href="#" class="text-decoration-none">Esqueceu a senha?</a>
+            <p class="mt-2">
+              Não tem conta?
+              <a href="cadastro.html" class="text-decoration-none"
+                >Cadastre-se</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>

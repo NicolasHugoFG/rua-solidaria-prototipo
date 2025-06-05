@@ -28,11 +28,22 @@ app.set('views', path.join(__dirname, 'views')); // where your .ejs files are
 
 class Session {
     ip: any;
-    user_id: any;
-    username: any;
-    constructor(ip: any, user_id: any, username: any) {
+    account: Account;
+    constructor(ip: any, account: Account) {
         this.ip = ip;
-        this.user_id = user_id;
+        this.account = account;
+    }
+}
+
+class Account {
+    id: number;
+    username: String;
+    tipo: ProfileType;
+    id_outro: number;
+    constructor(id: any, username: String, tipo: ProfileType, chave: any) {
+        this.id = id;
+        this.id_outro = chave;
+        this.tipo = tipo;
         this.username = username;
     }
 }
@@ -72,38 +83,111 @@ app.listen(port, () => {
     console.log(`App running at http://localhost:${port}`);
 });
 
+async function get_profile_user(res: Response, id: number): Promise<Profile | null> {
+    const [rows]: any = await connection.query("SELECT * FROM users WHERE id = ?", [
+        id
+    ]);
+    const user = rows[0];
+    console.log(id);
+    console.debug(user);
+    const [rows2]: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
+        user.profile_id
+    ]);
+    const perfil = rows2[0];
+    console.log("aaaaa");
+    console.debug(perfil);
+    const profile = new Profile(user.id, user.name, perfil.description, perfil.picture, ProfileType.instituition, "", perfil.email_publico);
+    return profile;
 
 
-app.get('/perfis/instituicoes/:id', async (req: Request, res: Response): Promise<any> => {
-    const id = req.params.id;
+}
+async function get_profile_institution(res: Response, id: String): Promise<Profile | null> {
     const rows: any = await connection.query("SELECT * FROM instituicoes WHERE id = ?", [
         id
     ]);
     if (rows.length == 0) {
         res.status(404);
-        return res.send("couldnt find instituitions");
+        res.send("couldnt find instituitions");
+        return null
     }
-    console.debug(rows[0][0]);
     const institution = rows[0][0];
-    console.debug(institution.profile_id);
     const rows2: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
         institution.profile_id
     ]);
     console.debug(rows2[0]);
     if (rows2.length == 0) {
         res.status(404);
-        return res.send("couldnt find instituitions");
+        res.send("couldnt find instituitions");
+        return null
     }
     const perfil = rows2[0][0];
     const profile = new Profile(institution.id, institution.name, perfil.description, perfil.picture, ProfileType.instituition, institution.link, perfil.email_publico);
-    console.log("perfil: ", perfil);
+
+    return profile;
+}
+
+app.get('/perfis/usuarios/:id', async (req: Request, res: Response): Promise<any> => {
+    const profile = await get_profile_user(res, req.params.id);
+    res.render("perfil_usuario", { profile });
+
+});
+
+app.get('/perfis/instituicoes/:id', async (req: Request, res: Response): Promise<any> => {
+    const id = req.params.id;
+    const profile = get_profile_institution(res, id);
 
     // res.render("perfil");
     res.render("perfil", { profile });
     return
 });
-async function fill_institutions() {
+app.get('/impacto', async (req: Request, res: Response): Promise<any> => {
+    await render(req, res, "impacto", { users, instituicoes, total_amount })
+});
 
+app.get('/doacao', async (req: Request, res: Response): Promise<any> => {
+    await render(req, res, "doacao", { users, instituicoes, total_amount })
+});
+app.get('/', async (req: Request, res: Response): Promise<any> => {
+    await render(req, res, "index", { users, instituicoes, total_amount })
+    return
+});
+
+app.get('/index-content', async (req: Request, res: Response): Promise<any> => {
+    await render(req, res, "index-content", {})
+    return
+});
+app.get('/top-nav', async (req: Request, res: Response): Promise<any> => {
+    render(req, res, "top-nav", {});
+    return
+});
+
+app.post("/api/register_donation", async (req: Request, res: Response): Promise<any> => {
+    console.log("fazendo pagamento", req.body.valor);
+    const [result] = await connection.execute("INSERT INTO doacoes(anonymous, instituicao_id, valor) VALUES(?,?,?)", [
+        1, req.body.instituicao, req.body.valor
+    ]);
+    console.debug(result);
+    console.debug(users);
+});
+
+app.post('/api/register_donation', async (req: Request, res: Response): Promise<any> => {
+    if (req.body.instituicao == undefined || req.body.valor == undefined) {
+        return res.status(400).send('Error: "name and isntituicao" is required');
+    }
+    var user = req.body.user_id ?? null;
+    const sql = `INSERT INTO doacoes(user_id, instituicao, valor) VALUES (?,?,?)`;
+    const values = [user, req.body.instituicao, req.body.valor];
+    try {
+        const [rows]: any = await connection.execute(sql, values);
+        console.log(rows.insertId);
+        return res.send(rows.insertId);
+    } catch (err) {
+        console.error("Error occurred:", err);
+        return res.status(403).send(err);
+    }
+});
+
+async function fill_institutions() {
     const rows: any = await connection.query("SELECT * FROM instituicoes", []);
     for (const institution of rows[0]) {
         const rows: any = await connection.query("SELECT * FROM profile WHERE id =?", [
@@ -207,73 +291,54 @@ async function calculate_total() {
 }
 
 
-function render(req: Request, res: Response, page_name: string, variables: any) {
+async function render(req: Request, res: Response, page_name: string, variables: any) {
     const session_num = req.cookies.session; // Replace 'cookieName' with the actual cookie name
-    var user = undefined;
+    variables.profile = undefined;
+    variables.account = undefined;
     if (session_num == undefined) {
         res.render(page_name, variables);
         return
     }
     const session = sessions.get(session_num);
     if (session) {
-        variables.user = session.username;
+        variables.account = session.account;
+        console.debug(session.account);
+        var profile = await get_profile_user(res, session.account.id_outro);
+        variables.profile = profile;
+        console.debug(variables);
         res.render(page_name, variables);
         return
     }
     console.log("no session stored with:", session_num);
     res.clearCookie("session");
-    res.render(page_name, { user, users, instituicoes, total_amount });
+    res.render(page_name, variables);
     return
 
 }
-app.get('/impacto', async (req: Request, res: Response): Promise<any> => {
-    var user = undefined;
-    console.debug(users);
-    render(req, res, "impacto", { user, users, instituicoes, total_amount })
-});
-
-app.get('/doacao', async (req: Request, res: Response): Promise<any> => {
-    var user = undefined;
-    render(req, res, "doacao", { user, users, instituicoes, total_amount })
-});
-app.get('/', async (req: Request, res: Response): Promise<any> => {
-    var user = undefined;
-    render(req, res, "index", { user, users, instituicoes, total_amount })
-    return
-
-});
-
-app.post("/api/register_donation", async (req: Request, res: Response): Promise<any> => {
-    console.log("fazendo pagamento", req.body.valor);
-    const [result] = await connection.execute("INSERT INTO doacoes(anonymous, instituicao_id, valor) VALUES(?,?,?)", [
-        1, 1, req.body.valor
-    ]);
-    console.debug(result);
-    console.debug(users);
-});
-
-app.post('/api/register_donation', async (req: Request, res: Response): Promise<any> => {
-    if (req.body.instituicao == undefined || req.body.valor == undefined) {
-        return res.status(400).send('Error: "name and isntituicao" is required');
-    }
-    var user = req.body.user_id ?? null;
-    const sql = `INSERT INTO doacoes(user_id, instituicao, valor) VALUES (?,?,?)`;
-    const values = [user, req.body.instituicao, req.body.valor];
-    try {
-        const [rows]: any = await connection.execute(sql, values);
-        console.log(rows.insertId);
-        return res.send(rows.insertId);
-    } catch (err) {
-        console.error("Error occurred:", err);
-        return res.status(403).send(err);
-    }
-});
-
 
 async function list_accounts() {
     const [rows]: any = await connection.query("SELECT * FROM account ");
     console.debug(rows);
 
+}
+
+async function new_cookie(req: Request, res: Response, account: Account) {
+    let token = crypto.randomBytes(16).toString("hex");
+    var session = new Session(req.ip, account);
+    res.cookie("session", token, {
+        httpOnly: true,
+        secure: true,
+        // maxAge: 60 * 10000,
+        maxAge: 60 * 1000,
+        sameSite: "strict",
+        path: "/",
+    });
+    setTimeout(() => {
+        sessions.delete(token);
+    }, 60 * 1000);
+
+    sessions.set(token, session);
+    console.log("cookie sent!");
 }
 
 app.post("/api/sign_in", async (req: Request, res: Response): Promise<any> => {
@@ -283,16 +348,15 @@ app.post("/api/sign_in", async (req: Request, res: Response): Promise<any> => {
     let password = req.body.password;
     console.log("aaa");
     const sql = `
-    INSERT INTO profile(description, picture, email_publico) VALUES("","/profile.png","");
+    INSERT INTO profile(description, picture, email_publico) VALUES("","/default.png","${email}");
     INSERT INTO users (name, tipo, profile_id) VALUES ("${username}", 1, LAST_INSERT_ID());
     INSERT INTO account (username, email, password, tipo, id_outro ) VALUES ("${username}", "${email}", "${password}", 1, LAST_INSERT_ID());
   `;
-    const [results] = await connection.query(sql);
+    const [results]: any = await connection.query(sql);
     console.debug(results);
-
-
-
-
+    let account = new Account(results[2].insertId, username, ProfileType.user, results[1].insertId);
+    new_cookie(req, res, account)
+    res.status(200).send('OK');
 });
 
 app.post("/api/login_form", async (req: Request, res: Response): Promise<any> => {
@@ -301,8 +365,6 @@ app.post("/api/login_form", async (req: Request, res: Response): Promise<any> =>
 
     let email = req.body.email;
     let password = req.body.password;
-    // let email = "admin@example.com";
-    // let password = "senha";
     const [rows]: any = await connection.query("SELECT * FROM account WHERE email = ?", [
         email,
     ]);
@@ -310,28 +372,13 @@ app.post("/api/login_form", async (req: Request, res: Response): Promise<any> =>
         res.status(404);
         return res.send("couldnt find email");
     }
-    console.debug(rows[0]);
     let user = rows[0];
     if (user.password != password) {
         res.status(401);
         return res.send("wrong password");
     }
-
-    let token = crypto.randomBytes(16).toString("hex");
-    var session = new Session(req.ip, user.id, user.username);
-    console.log(session.ip, session.user_id);
-    res.cookie("session", token, {
-        httpOnly: true,
-        secure: true,
-        // maxAge: 60 * 10000,
-        maxAge: 60 * 1000,
-        sameSite: "strict",
-        path: "/",
-    });
-    res.send("ok");
-    sessions.set(token, session);
-    // sessions[token] = session;
-    console.log("cookie sent!");
+    new_cookie(req, res, user);
+    res.status(200).send('OK');
 });
 
 // MySQL connection setup
@@ -353,20 +400,17 @@ async function connectToDB() {
         console.error("Database connection failed:", err);
     }
 }
-function timeout() {
+function timeout(time: number) {
     const timer: NodeJS.Timeout = setTimeout(() => {
         // fill_institutions();
         calculate_total();
-        timeout();
-    }, 500);
+        timeout(500);
+    }, time);
 }
 connectToDB().then(() => {
     fill_institutions().then(() => {
         calculate_total().then(() => { })
     });
-    timeout();
+    timeout(500);
 });
 
-function get_profile(id: String): Profile {
-}
-// await connectToDB();

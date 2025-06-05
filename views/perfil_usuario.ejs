@@ -1,0 +1,9 @@
+<main id="main-content">
+    <div class="profile-pic-container">
+      <img src=<%= "/imgs" + profile.picture %> alt="Foto de Perfil" class="profile-pic" />
+      <div class="edit-icon" onclick="alert('Editar foto')">✏️</div>
+    </div>
+        <h2><%= profile.name %></h2>
+        <p><%= profile.email %></p>
+        <p class="donated">Total doado:<%= profile.value %></p>
+</main>

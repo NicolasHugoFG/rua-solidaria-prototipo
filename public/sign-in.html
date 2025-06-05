@@ -1,0 +1,66 @@
+<main id="main-content">
+  <section id="sign-in-usuario" class="fade-in">
+    <div class="container">
+      <div class="auth-container">
+        <h2 class="form-title">Criar Conta</h2>
+        <form id="registerForm" class="login-page">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Senha</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              minlength="8"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="birthdate" class="form-label">Data de Nascimento</label>
+            <input
+              type="date"
+              class=""
+              id="birthdate"
+              name="birthdate"
+              required
+            />
+          </div>
+
+          <button type="button" onclick="cadastrar()" class="btn-custom">
+            Cadastrar
+          </button>
+
+          <div class="mt-3 text-center">
+            <p>
+              Já tem uma conta?
+              <a href="#" id="loginLink">é uma instituição?</a>
+            </p>
+          </div>
+          <div class="mt-3 text-center">
+            <p>Já tem uma conta? <a href="#" id="loginLink">Faça login</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>

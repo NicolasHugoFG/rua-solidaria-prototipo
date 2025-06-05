@@ -1,48 +1,5 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Rua Solidária</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    </head>
-  <body>
-    <link rel="stylesheet" href="style.css" />
-        <div class="page-container">
-    <header>
-      <div class="header-container">
-        <img
-          src="LogoRuaSolidariaPNG.png"
-          alt="Logo Rua Solidária"
-          class="logo"
-        />
-        <div class="titulo">
-          <h1>RUA SOLIDÁRIA</h1>
-          <p>Transforme doações em esperança e dignidade!</p>
-        </div>
-      </div>  
-        <% if (user) { %>
-            <div id="login_sign" class="fade-in">
-
-            <a href="/"><%= user%> aaaa</a>
-
-            <img src="default.png" width="32" height="32" alt="Default Image" />
-
-            </div>
-        <% } else { %>
-
-      <div id="login_sign" class="fade-in">
-        <a href="#" onclick="mostrar_login(); return false;">Login</a>
-        /
-        <a href="#" onclick="mostrar_signin(); return false;">Sign-In</a>
-      </div>
-       <% } %>
-    </header>
-      <section id="doacao" class="fade-in" >
+<main id="main-content">
+    <section id="doacao" class="fade-in" >
          <div class= "doacao-container">
             <h3>COMO FAZER SUA DOAÇÃO</h3>
             <button id="btnComoDoar" class="btn-info">
@@ -102,13 +59,13 @@ A Rua Solidária é uma ponte entre o coração de quem quer ajudar e as mãos q
             <h3 >Doe agora:</h3>
             <form id="formDoacao">
               <div class="form-doacao">
-                <select onchange="myFunction(this.value)" id="instituicao" required>
-                  <option value="" disabled selected>
+                <select id="form-select" onchange="myFunction(this.value)" id="instituicao" required>
+                  <option value="1" disabled selected>
                     Selecione a instituição
                   </option>
-                  <option value="Rua Solidaria">Rua Solidaria</option>
-                  <option value="Instituto Ramacrisma">Instituto Ramacrisma</option>
-                  <option value="Pão dos Pobres">Pão dos Pobres</option>
+                  <option value="0">Rua Solidaria</option>
+                  <option value="1">Instituto Ramacrisma</option>
+                  <option value="2">Pão dos Pobres</option>
                 </select>
                 <input
                   type="number"
@@ -134,10 +91,7 @@ A Rua Solidária é uma ponte entre o coração de quem quer ajudar e as mãos q
 
             </div>
             <div id="mensagemResultado"></div>
-            <button onclick="voltarInicio()">Voltar ao Início</button>
+            <button onclick="return_to_home()">Voltar ao Início</button>
          </div>
       </section>
-        </div>
-    <script src="/doacao.js"></script>
-    </body>
-</html>
+</main>

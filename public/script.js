@@ -46,24 +46,43 @@ window.addEventListener("DOMContentLoaded", () => {
   console.debug(current);
 
   window.mostrarDoacao = () => {
-    fadeOut(current, "/doacao");
+    htmx.ajax("GET", "/doacao", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
   };
 
   window.mostrar_login = () => {
-    console.log("i was clicked");
-    current.style.display = "none";
-    current = document.getElementById("login");
-    current.style.display = "block";
+    htmx.ajax("GET", "/login.html", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
+  };
+  window.mostrar_conta = (conta) => {
+    console.log("going:", conta);
+    htmx.ajax("GET", conta, {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
   };
   window.mostrar_signin = () => {
-    console.log("i was clicked");
-    current.style.display = "none";
-    current = document.getElementById("sign-in-usuario");
-    current.style.display = "block";
+    htmx.ajax("GET", "/sign-in.html", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
+  };
+  window.return_to_home = () => {
+    htmx.ajax("GET", "/index-content", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
   };
 
   window.mostrarImpacto = () => {
-    fadeOut(current, "/impacto");
+    htmx.ajax("GET", "/impacto", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
 
     // current = document.getElementById("valores-arrecadados");
     // current.style.display = "block";
@@ -183,10 +202,6 @@ async function handle_login_form(data) {
   }
 }
 
-function myFunction(value) {
-  alert("You selected: " + value);
-}
-
 async function handle_cadastrar(data) {
   console.log(JSON.stringify(data));
   const response = await fetch("/api/sign_in", {
@@ -198,15 +213,30 @@ async function handle_cadastrar(data) {
     },
   });
   if (response.ok) {
-    cookie = response.body;
-    console.log("loged in with success");
+    window.location.href = "/";
   }
 }
 function cadastrar() {
   data = {};
-  data.email = "aaa@";
-  data.username = "nicky";
-  data.password = "senha";
-  console.debug(data);
+  data.email = document.getElementById("email").value;
+  data.username = document.getElementById("username").value;
+  data.password = document.getElementById("password").value;
   handle_cadastrar(data).then();
+}
+async function fazer_pagamento(data) {
+  const response = await fetch("/api" + "/register_donation", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+function pagar() {
+  const element = document.getElementById("valor");
+  data = {};
+  data.instituicao = document.getElementById("form-select").value;
+  data.valor = element.value;
+  fazer_pagamento(data).then(alert("doado"));
 }
