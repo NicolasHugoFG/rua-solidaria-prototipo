@@ -4,6 +4,8 @@ import crypto from "crypto";
 import { fileURLToPath } from 'url';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import multer from 'multer';
+
 
 
 
@@ -24,6 +26,7 @@ app.use(express.json()); // ✅ Must be at the top
 app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views')); // where your .ejs files are
+const upload = multer({ dest: 'public/images' });
 
 
 class Session {
@@ -33,6 +36,69 @@ class Session {
         this.ip = ip;
         this.account = account;
     }
+}
+
+enum UserType {
+    normal,
+    admin
+}
+
+
+
+class User {
+    id: number;
+    name: String;
+    show_donations: boolean;
+    tipo: UserType;
+    profile_id: number;
+
+    constructor(id: number, name: String, show_donations: boolean, tipo: UserType, profile_id: number) {
+        this.id = id;
+        this.name = name;
+        this.show_donations = show_donations;
+        this.tipo = tipo;
+        this.profile_id = profile_id;
+    }
+}
+async function get_user_dao(id: number): Promise<User | null> {
+    const [rows]: any = await connection.query("SELECT * FROM users WHERE id = ?", [
+        id
+    ]);
+    const user = rows[0];
+    if (user.length == 0) {
+        return null;
+    }
+    return new User(user.id, user.name, user.show_donations, user.tipo, user.profile_id);
+
+}
+
+
+class Donation {
+    id: number;
+    user_id: number | null;
+    anonymous: boolean;
+    instituicao_id: number;
+    valor: number;
+    constructor(id: number, user_id: number | null, anonymous: boolean, instituicao_id: number, valor: number) {
+        this.id = id;
+        this.user_id = user_id;
+        this.anonymous = anonymous;
+        this.instituicao_id = instituicao_id;
+        this.valor = valor;
+    }
+
+
+}
+async function get_donation(id: number): Promise<Donation | null> {
+    const [rows]: any = await connection.query("SELECT * FROM donations WHERE id = ?", [
+        id
+    ]);
+    const donation = rows[0];
+    if (donation.length == 0) {
+        return null;
+    }
+    return new Donation(donation.id, donation.user_id, donation.anonymoys, donation.instituicao_id, donation.valor);
+
 }
 
 class Account {
@@ -54,6 +120,7 @@ enum ProfileType {
     admin,
 }
 class Profile {
+    user_id: number | null;
     id: number | null;
     name: String;
     description: String;
@@ -62,7 +129,9 @@ class Profile {
     link: String;
     email: String;
     value: number = 0.00;
-    constructor(id: number | null, name: String, description: String, picture: String, type: ProfileType, link: String, email: String) {
+    message: String;
+    constructor(user_id: number | null, id: number | null, name: String, description: String, picture: String, type: ProfileType, link: String, email: String, message = "") {
+        this.user_id = user_id;
         this.id = id;
         this.name = name;
         this.description = description;
@@ -70,6 +139,7 @@ class Profile {
         this.type = type;
         this.link = link;
         this.email = email;
+        this.message = message;
     }
 }
 
@@ -83,26 +153,33 @@ app.listen(port, () => {
     console.log(`App running at http://localhost:${port}`);
 });
 
+async function get_profile_dao(id: number): Promise<Profile | null> {
+    const [rows]: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
+        id
+    ]);
+    const perfil = rows[0];
+    return perfil;
+
+}
 async function get_profile_user(res: Response, id: number): Promise<Profile | null> {
     const [rows]: any = await connection.query("SELECT * FROM users WHERE id = ?", [
         id
     ]);
     const user = rows[0];
     console.log(id);
-    console.debug(user);
     const [rows2]: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
         user.profile_id
     ]);
     const perfil = rows2[0];
-    console.log("aaaaa");
-    console.debug(perfil);
-    const profile = new Profile(user.id, user.name, perfil.description, perfil.picture, ProfileType.instituition, "", perfil.email_publico);
+    const profile = new Profile(user.id, perfil.id, user.name, perfil.description, perfil.picture, ProfileType.user, "", perfil.email_publico);
+
     return profile;
 
 
 }
 async function get_profile_institution(res: Response, id: String): Promise<Profile | null> {
-    const rows: any = await connection.query("SELECT * FROM instituicoes WHERE id = ?", [
+
+    const [rows]: any = await connection.query("SELECT * FROM instituicoes WHERE id = ?", [
         id
     ]);
     if (rows.length == 0) {
@@ -110,31 +187,76 @@ async function get_profile_institution(res: Response, id: String): Promise<Profi
         res.send("couldnt find instituitions");
         return null
     }
-    const institution = rows[0][0];
-    const rows2: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
+    const institution = rows[0];
+    const [rows2]: any = await connection.query("SELECT * FROM profile WHERE id = ?", [
         institution.profile_id
     ]);
-    console.debug(rows2[0]);
     if (rows2.length == 0) {
         res.status(404);
         res.send("couldnt find instituitions");
         return null
     }
-    const perfil = rows2[0][0];
-    const profile = new Profile(institution.id, institution.name, perfil.description, perfil.picture, ProfileType.instituition, institution.link, perfil.email_publico);
+    const perfil = rows2[0];
+    const profile = new Profile(null, institution.id, institution.name, perfil.description, perfil.picture, ProfileType.instituition, institution.link, perfil.email_publico);
 
     return profile;
 }
 
+app.post('/api/save_profile', async (req: Request, res: Response): Promise<any> => {
+    const cookie: any = req.cookies.session;
+    if (cookie == undefined) return;
+    let session = sessions.get(cookie);
+    if (session == undefined) {
+        return;
+    }
+    let user = await get_user_dao(session!.account.id_outro);
+    console.debug(user);
+    if (user == undefined) return;
+    let name: any = req.body.name;
+    let description = req.body.description;
+    console.debug(req.body);
+    if (description == undefined && name == undefined) {
+        res.status(500).send("error");
+        return
+    }
+    if (description) {
+        await connection.execute("UPDATE profile SET description=?  WHERE id=?", [
+            description, user!.profile_id]);
+    }
+    if (name) {
+        await connection.execute("UPDATE users SET name=? WHERE id=?", [
+            name, user!.id]);
+    }
+    res.status(200).send("ok");
+    return
+});
+app.post('/api/upload/:id', upload.single('image'), async (req: Request, res: Response): Promise<any> => {
+    const cookie: any = req.cookies.session;
+    if (cookie == undefined) return;
+    const id: number = parseInt(req.params.id);
+
+
+    log("nova imagem feita o upload:" + req.file?.filename);
+    const [result] = await connection.execute("UPDATE profile SET picture=? WHERE id=?", [
+        "/" + req.file.filename, id]);
+    res.status(200).send("ok");
+
+
+});
 app.get('/perfis/usuarios/:id', async (req: Request, res: Response): Promise<any> => {
-    const profile = await get_profile_user(res, req.params.id);
+    // const profile = await get_profile_user(res, req.params.id);
+    // if (profile == null) {
+    //     console.error("couldnt find proifile");
+    // }
+    const profile = get_user(users, parseInt(req.params.id));
+    console.debug(profile);
     res.render("perfil_usuario", { profile });
 
 });
 
 app.get('/perfis/instituicoes/:id', async (req: Request, res: Response): Promise<any> => {
     const id = req.params.id;
-    const profile = get_profile_institution(res, id);
+    const profile = await get_profile_institution(res, id);
 
     // res.render("perfil");
     res.render("perfil", { profile });
@@ -157,18 +279,45 @@ app.get('/index-content', async (req: Request, res: Response): Promise<any> => {
     return
 });
 app.get('/top-nav', async (req: Request, res: Response): Promise<any> => {
-    render(req, res, "top-nav", {});
+    await render(req, res, "top-nav", {});
+    return
+});
+app.get('/admins', async (req: Request, res: Response): Promise<any> => {
+    // await render(req, res, "ad", {});
+    var logs = await get_logs();
+    render(req, res, "admins", { logs })
     return
 });
 
 app.post("/api/register_donation", async (req: Request, res: Response): Promise<any> => {
-    console.log("fazendo pagamento", req.body.valor);
-    const [result] = await connection.execute("INSERT INTO doacoes(anonymous, instituicao_id, valor) VALUES(?,?,?)", [
-        1, req.body.instituicao, req.body.valor
-    ]);
-    console.debug(result);
-    console.debug(users);
+    const session_num = req.cookies.session; // Replace 'cookieName' with the actual cookie name
+    if (session_num) {
+        const session = sessions.get(session_num);
+        const user = await get_user_dao(session!.account.id_outro);
+        console.log("vou fazer doacao:");
+        if (user) {
+            const [result] = await connection.execute("INSERT INTO doacoes(user_id, instituicao_id, valor, message) VALUES(?,?,?,?)", [
+                user!.id, req.body.instituicao, req.body.valor, req.body.message]);
+            res.status(200).send("Ok");
+            log("doação feita por: " + user!.name);
+            return
+        }
+    }
+    const [result] = await connection.execute("INSERT INTO doacoes(anonymous, instituicao_id, valor, message) VALUES(?,?,?,?)", [
+        1, req.body.instituicao, req.body.valor, req.body.message]);
+    res.status(200).send("Ok");
+    log("doação feita por anonymous: ");
 });
+
+
+async function get_logs(): Promise<any> {
+    const [result]: any = await connection.query("SELECT * FROM logs", []);
+    return result
+}
+
+async function log(message: String) {
+    await connection.execute("INSERT INTO logs( message) VALUES(?)", [message]);
+}
 
 app.post('/api/register_donation', async (req: Request, res: Response): Promise<any> => {
     if (req.body.instituicao == undefined || req.body.valor == undefined) {
@@ -194,17 +343,16 @@ async function fill_institutions() {
             institution.profile_id
         ]);
         var perfil = rows[0][0];
-        const profile = new Profile(institution.id, institution.name, perfil.description, perfil.picture, ProfileType.instituition, institution.link, perfil.email_publico);
+        const profile = new Profile(null, institution.id, institution.name, perfil.description, perfil.picture, ProfileType.instituition, institution.link, perfil.email_publico);
 
         instituicoes.set(institution.id, profile);
     }
-    // console.debug(instituicoes);
 
 
 }
 
 function add_anon(users: any, doacao: any) {
-    const profile = new Profile(null, "Anonymous", doacao.message, "/default.png", ProfileType.user, "", "");
+    const profile = new Profile(null, null, "Anonymous", "", "/default.png", ProfileType.user, "", "", doacao.message);
     profile.value += doacao.valor;
     users.push(profile);
 }
@@ -212,7 +360,6 @@ function add_anon(users: any, doacao: any) {
 async function add_user(users: any, doacao: any, id: number) {
     const rows: any = await connection.query("SELECT * FROM users where id=?", [id]);
     var user = rows[0][0];
-    // console.debug(user);
     if (!user.show_donations) {
         add_anon(users, doacao);
         return
@@ -221,33 +368,33 @@ async function add_user(users: any, doacao: any, id: number) {
         user.profile_id
     ]);
     var perfil = rows2[0][0];
-    const profile = new Profile(user.id, user.name, doacao.message, perfil.picture, ProfileType.user, "", perfil.email_publico);
+    const profile = new Profile(user.id, perfil.id, user.name, perfil.description, perfil.picture, ProfileType.user, "", perfil.email_publico, doacao.message);
     profile.value += doacao.valor;
     users.push(profile);
 
 }
 
-function has_id(users: any, id: number): boolean {
-    for (const user of users) {
-        if (user.id == null) {
+function has_id(profiles: any, id: number): boolean {
+    for (const profile of profiles) {
+        if (profile.user_id == null) {
             continue;
         }
-        if (user.id == id) {
+        if (profile.user_id == id) {
             return true;
         }
     }
     return false
 }
 
-function get_user(users: Profile[], id: number): Profile {
+function get_user(profiles: Profile[], id: number): Profile {
     var i = 0;
-    for (const user of users) {
-        if (user.id == null) {
+    for (const profile of profiles) {
+        if (profile.user_id == null) {
             i += 1;
             continue;
         }
-        if (user.id == id) {
-            return user;
+        if (profile.user_id == id) {
+            return profile;
         }
         i += 1;
     }
@@ -280,6 +427,7 @@ async function calculate_total() {
         }
         var profile = get_user(users_temp, user_id);
         profile.value += row.valor;
+        profile.message = row.message;
     }
     total_amount = new_total;
     instituicoes_temp.forEach((i, key) => {
@@ -302,14 +450,11 @@ async function render(req: Request, res: Response, page_name: string, variables:
     const session = sessions.get(session_num);
     if (session) {
         variables.account = session.account;
-        console.debug(session.account);
         var profile = await get_profile_user(res, session.account.id_outro);
         variables.profile = profile;
-        console.debug(variables);
         res.render(page_name, variables);
         return
     }
-    console.log("no session stored with:", session_num);
     res.clearCookie("session");
     res.render(page_name, variables);
     return
@@ -318,74 +463,83 @@ async function render(req: Request, res: Response, page_name: string, variables:
 
 async function list_accounts() {
     const [rows]: any = await connection.query("SELECT * FROM account ");
-    console.debug(rows);
 
 }
 
 async function new_cookie(req: Request, res: Response, account: Account) {
     let token = crypto.randomBytes(16).toString("hex");
     var session = new Session(req.ip, account);
+    log("new cookie created to user: " + session.account.username);
     res.cookie("session", token, {
         httpOnly: true,
         secure: true,
         // maxAge: 60 * 10000,
-        maxAge: 60 * 1000,
+        maxAge: 60 * 10000,
         sameSite: "strict",
         path: "/",
     });
     setTimeout(() => {
         sessions.delete(token);
-    }, 60 * 1000);
+    }, 60 * 10000);
 
     sessions.set(token, session);
-    console.log("cookie sent!");
 }
 
+app.post("/api/logout", async (req: Request, res: Response): Promise<any> => {
+    let cookie = req.cookies.session;
+    res.clearCookie('session');
+    if (cookie == undefined) {
+        res.status(200).send("Ok");
+        return
+    }
+    sessions.delete(cookie);
+    res.status(200).send("Ok");
+});
+
 app.post("/api/sign_in", async (req: Request, res: Response): Promise<any> => {
-    console.debug(req.body);
     let username = req.body.username;
     let email = req.body.email;
     let password = req.body.password;
-    console.log("aaa");
     const sql = `
     INSERT INTO profile(description, picture, email_publico) VALUES("","/default.png","${email}");
     INSERT INTO users (name, tipo, profile_id) VALUES ("${username}", 1, LAST_INSERT_ID());
     INSERT INTO account (username, email, password, tipo, id_outro ) VALUES ("${username}", "${email}", "${password}", 1, LAST_INSERT_ID());
   `;
     const [results]: any = await connection.query(sql);
-    console.debug(results);
     let account = new Account(results[2].insertId, username, ProfileType.user, results[1].insertId);
     new_cookie(req, res, account)
     res.status(200).send('OK');
 });
 
 app.post("/api/login_form", async (req: Request, res: Response): Promise<any> => {
-    console.debug(req.body);
     list_accounts();
-
-    let email = req.body.email;
+    let username = req.body.username;
+    let account = undefined;
+    if (username.includes('@')) {
+        const [rows]: any = await connection.query("SELECT * FROM account WHERE email = ?", [
+            username,
+        ]);
+        account = rows[0];
+    }
+    else {
+        const [rows]: any = await connection.query("SELECT * FROM account WHERE username = ?", [
+            username,
+        ]);
+        account = rows[0];
+    }
     let password = req.body.password;
-    const [rows]: any = await connection.query("SELECT * FROM account WHERE email = ?", [
-        email,
-    ]);
-    if (rows.length == 0) {
-        res.status(404);
-        return res.send("couldnt find email");
-    }
-    let user = rows[0];
-    if (user.password != password) {
-        res.status(401);
-        return res.send("wrong password");
-    }
-    new_cookie(req, res, user);
-    res.status(200).send('OK');
+    if (account.password != password) return res.status(401).send("wrong password");
+    new_cookie(req, res, account);
+    res.status(200).send('ok');
 });
 
 // MySQL connection setup
 const dbConfig = {
-    host: "localhost",
+    host: "sql-rua-solidaria3.internal",
+    // host: "localhost",
     user: "root",
-    password: "senha",
+    // password: "senha",
+    password: "senhasenhasenhasenha",
     database: "RuaSolidaria",
     port: 3308,
     multipleStatements: true,
@@ -402,13 +556,14 @@ async function connectToDB() {
 }
 function timeout(time: number) {
     const timer: NodeJS.Timeout = setTimeout(() => {
-        // fill_institutions();
+        fill_institutions();
         calculate_total();
-        timeout(500);
+        timeout(time);
     }, time);
 }
 connectToDB().then(() => {
     fill_institutions().then(() => {
+        log("server started at port 3308");
         calculate_total().then(() => { })
     });
     timeout(500);

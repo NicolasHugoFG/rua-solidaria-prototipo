@@ -45,10 +45,74 @@ window.addEventListener("DOMContentLoaded", () => {
   let current = document.getElementById("conteudo");
   console.debug(current);
 
+  window.mostrar_pix = () => {
+    document.getElementById("pix-container").style = "display: block";
+  };
+
   window.mostrarDoacao = () => {
     htmx.ajax("GET", "/doacao", {
       target: "#main-content",
       swap: "outerHTML",
+    });
+  };
+  window.ir_para_pagina_de_admins = () => {
+    htmx.ajax("GET", "/admins", {
+      target: "#main-content",
+      swap: "outerHTML",
+    });
+  };
+
+  window.editar_foto = (id) => {
+    const input = document.getElementById("fileInput");
+    input.addEventListener("change", (event) => {
+      const file = input.files?.[0];
+      const formData = new FormData();
+      formData.append("image", file); // "image" is the field name on the server
+      console.log(id);
+
+      fetch("/api/upload/" + id, {
+        method: "POST",
+        body: formData,
+      }).then(() => {
+        window.location.reload();
+      });
+    });
+    input.click();
+  };
+  window.como_doar = () => {
+    document.getElementById("infoComoDoar").style = "display:block";
+  };
+  window.save_profile = () => {
+    const name = document.getElementById("profile_name").textContent;
+    const description = document.getElementById(
+      "profile_description",
+    ).textContent;
+    const data = { name, description };
+    console.debug(data);
+    fetch("/api" + "/save_profile", {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      if (!response.ok) {
+        alert("error updating");
+      } else {
+        window.location.reload();
+      }
+    });
+  };
+  window.mostrar_mapa = () => {
+    window.location.href = "mapa.html";
+  };
+  window.logout = () => {
+    fetch("/api" + "/logout", {
+      method: "POST",
+      credentials: "include",
+    }).then(() => {
+      window.location.href = "/";
     });
   };
 
@@ -141,16 +205,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   window.login_form = () => {
     console.log("form sending");
-    const email = document.getElementById("email_login").value;
+    const username = document.getElementById("email_login").value;
     const password = document.getElementById("password_login").value;
     var data;
-    console.log("email :" + email + "password: " + password);
-    if ((email != undefined) & (password != undefined)) {
-      data = { email: email, password: password };
-      handle_login_form(data).then(() => {
-        window.location.href = "/";
-      });
-      console.log("recieved cookie");
+    console.log("email :" + username + "password: " + password);
+    if ((username != undefined) & (password != undefined)) {
+      data = { username: username, password: password };
+      handle_login_form(data).then();
     }
   };
 
@@ -187,7 +248,7 @@ async function send_donation_form(data) {
   }
 }
 async function handle_login_form(data) {
-  console.log("handling login form");
+  console.debug(data);
   const response = await fetch("/api/login_form", {
     method: "POST",
     body: JSON.stringify(data),
@@ -196,9 +257,11 @@ async function handle_login_form(data) {
       "Content-Type": "application/json",
     },
   });
-  if (response.ok) {
-    cookie = response.body;
-    console.log("loged in with success");
+  if (!response.ok) {
+    alert("error in login");
+  } else {
+    alert("logged in");
+    window.location.reload(true);
   }
 }
 
@@ -212,8 +275,10 @@ async function handle_cadastrar(data) {
       "Content-Type": "application/json",
     },
   });
-  if (response.ok) {
-    window.location.href = "/";
+  if (!response.ok) {
+    alert("erro ao cadastrar");
+  } else {
+    window.location.reload();
   }
 }
 function cadastrar() {
@@ -233,10 +298,13 @@ async function fazer_pagamento(data) {
   });
 }
 
+async function post_request() {}
+
 function pagar() {
   const element = document.getElementById("valor");
   data = {};
   data.instituicao = document.getElementById("form-select").value;
+  data.message = document.getElementById("message").value;
   data.valor = element.value;
   fazer_pagamento(data).then(alert("doado"));
 }

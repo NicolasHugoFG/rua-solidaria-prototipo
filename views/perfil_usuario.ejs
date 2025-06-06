@@ -1,9 +1,15 @@
 <main id="main-content">
+    
     <div class="profile-pic-container">
-      <img src=<%= "/imgs" + profile.picture %> alt="Foto de Perfil" class="profile-pic" />
-      <div class="edit-icon" onclick="alert('Editar foto')">✏️</div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+
+      <img src=<%= "/images" + profile.picture %> alt="Foto de Perfil" class="profile-pic" />
+    <div class="edit-icon" onclick="editar_foto('<%= profile.id %>')">✏️</div>
     </div>
-        <h2><%= profile.name %></h2>
+        <h2 id="profile_name" class="editable-text"  contenteditable="true" ><%= profile.name %></h2>
+
         <p><%= profile.email %></p>
+        <h2 id="profile_description" class="editable-text" contenteditable="true"><%= profile.description %></h2>
         <p class="donated">Total doado:<%= profile.value %></p>
+        <button class="btn btn-primary" onclick="save_profile()">salvar</button>
 </main>

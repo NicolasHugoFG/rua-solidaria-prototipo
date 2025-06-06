@@ -1,0 +1,34 @@
+# fly.toml app configuration file generated for sql-damp-pond-7526 on 2025-06-05T14:03:17-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'sql-rua-solidaria3'
+primary_region = 'gru'
+
+[build]
+  dockerfile = "./Dockerfile"
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+
+[processes]
+  app = """--datadir /data/mysql \
+    --default-authentication-plugin=mysql_native_password \
+    --port=3308"""
+
+[[services]]
+  internal_port = 3308
+  protocol = "tcp"
+  processes = ["app"]
+
+
+  [[services.ports]]
+    port = 3308
+
+[mounts]
+  source = "mysqldata"
+  destination = "/data"

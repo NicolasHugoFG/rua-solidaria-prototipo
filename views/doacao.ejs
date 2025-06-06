@@ -2,7 +2,7 @@
     <section id="doacao" class="fade-in" >
          <div class= "doacao-container">
             <h3>COMO FAZER SUA DOAÇÃO</h3>
-            <button id="btnComoDoar" class="btn-info">
+            <button id="btnComoDoar" class="btn-info" onclick="como_doar()">
               Clique aqui para saber como doar
             </button>
             <div id="infoComoDoar" class="info-doacao" style="display: none">
@@ -25,7 +25,7 @@
               <p><strong>Doe com o coração. Faça a diferença agora.</strong></p>
             </div>
             <h1>FAÇA SUA DOAÇÃO</h1>
-            <button id="btnComoDoar" class="btn-info">
+            <button id="btnComoDoar" class="btn-info" onclick="mostrar_mapa()">
              Doar para locais publicos 
             </button>
 
@@ -63,9 +63,9 @@ A Rua Solidária é uma ponte entre o coração de quem quer ajudar e as mãos q
                   <option value="1" disabled selected>
                     Selecione a instituição
                   </option>
-                  <option value="0">Rua Solidaria</option>
-                  <option value="1">Instituto Ramacrisma</option>
-                  <option value="2">Pão dos Pobres</option>
+                  <option value="1">Rua Solidaria</option>
+                  <option value="2">Instituto Ramacrisma</option>
+                  <option value="3">Pão dos Pobres</option>
                 </select>
                 <input
                   type="number"
@@ -75,19 +75,19 @@ A Rua Solidária é uma ponte entre o coração de quem quer ajudar e as mãos q
                 />
                 <input
                   type="text"
-                  id="valor"
+                  id="message"
                   placeholder="Escreva sua mensagem"
                 />
-              <button onclick="pagar()" type="button">pagar</button>
-              <button onclick="mostar_pix()" type="button">gerar chava pix</button>
+              <button onclick="mostrar_pix()" type="button">gerar chave pix</button>
               </div>
             </form>
                 <div class="fade-in pix-container doacao-container" id="pix-container">
-                <img src ="/Qr Code Pao dos Pobres.png" />
+                <img src ="/imgs/Qr Code Pao dos Pobres.png" />
                 <p>Chave pix: </p>
                 <p class="pix">dcoo4GHo2IxgM394c92dParmqYXDLrybPOUqo3x4m0cbDlz4R4<p>
                 <p> esperando confirmação.... </p>
-                            </div>
+                <button onclick="pagar()" type="button">pagar</button>
+                </div>
 
             </div>
             <div id="mensagemResultado"></div>

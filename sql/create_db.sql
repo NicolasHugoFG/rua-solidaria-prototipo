@@ -3,6 +3,11 @@ CREATE TABLE IF NOT EXISTS userType(
     name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS logs(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    message VARCHAR(155) NOT NULL,
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE IF NOT EXISTS accountType(
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL
@@ -72,6 +77,12 @@ INSERT INTO profile(description, picture, email_publico)
 VALUES ("eu sou o admin", "/default.png", "");
 
 INSERT INTO profile(description, picture, email_publico)
+VALUES ("A Rua Solidária é uma ponte entre o coração de quem quer ajudar e as mãos que mais precisam. Somos uma instituição dedicada a coletar e distribuir doações de forma transparente e eficiente — tanto para outras organizações comprometidas com o bem, quanto para nossas próprias ações sociais.
+", "/LogoRuaSolidariaPNG.png", "rua_solidaria@ulife.org.br");
+
+
+
+INSERT INTO profile(description, picture, email_publico)
 VALUES ("O Instituto Ramacrisna transforma vidas há décadas, oferecendo educação, cultura e oportunidades reais para crianças e jovens em situação de vulnerabilidade", "/ramacrisna.png", "faleconosco@ramacrisna.org.br");
 
 INSERT INTO profile(description, picture, email_publico)
@@ -84,18 +95,25 @@ INSERT INTO account (id, username, email, password, tipo, id_outro)
 VALUES (1, 'Admin_User', 'admin@example.com', "senha", 1, LAST_INSERT_ID());
 
 INSERT INTO instituicoes(name, cnpj, link, profile_id)
-VALUES ("institutio ramacrisna", "000000000000", "https://ramacrisna.org.br/", 2);
+VALUES ("Rua Solidaria", "000000000002", "https://rua-solidaria.org.br/", 2);
+
+INSERT INTO account(username, password, email, tipo, id_outro)
+VALUES ("Rua-Solidaria", "senha", 'rua_solidaria@ulife.org.br', 2, LAST_INSERT_ID());
+
+INSERT INTO instituicoes(name, cnpj, link, profile_id)
+VALUES ("institutio ramacrisna", "000000000000", "https://ramacrisna.org.br/", 3);
 
 INSERT INTO account(username, password, email, tipo, id_outro)
 VALUES ("ramacrisna", "senha", 'faleconosco@ramacrisna.org.br', 2, LAST_INSERT_ID());
 
 INSERT INTO instituicoes(name, cnpj, link, profile_id)
-VALUES ("pao dos pobres", "000000000001","https://www.paodospobres.org.br/", 3);
+VALUES ("pao dos pobres", "000000000001","https://www.paodospobres.org.br/", 4);
 
 INSERT INTO account(username, password, email, tipo, id_outro)
 VALUES ("pao_dos_pobres", "senha", "relacaoinstitucional@paodospobres.com.br", 2, LAST_INSERT_ID());
 
 INSERT INTO doacoes(user_id, instituicao_id, valor)
 VALUES (1, 1, 0.75);
+
 
 

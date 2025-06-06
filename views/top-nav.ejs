@@ -13,8 +13,14 @@
         <% if (account && profile) { %>
         <div id="login_sign" class="fade-in">
         <a href="#" onclick="mostrar_conta( '<%= "/perfis/usuarios/"+ account.id_outro %>' ); return false"><%= account.username%>
-            <img src=<%= "/imgs" + profile.picture%> width="32" height="32" alt="Default Image" />
+            <img src=<%= "/images" + profile.picture%> width="32" height="32" alt="Default Image" />
             </a>
+        <button class="btn btn-primary  p-1  m-0">
+          <i class="bi bi-inbox"></i> 
+        </button>
+        <button class="btn btn-primary  p-1 m-0" onclick="logout()">
+            <i class="bi bi-person"></i><i class="bi bi-box-arrow-right ms-1"></i>
+        </button>
         </div>
     <% } else { %>
       <div id="login_sign" class="fade-in">

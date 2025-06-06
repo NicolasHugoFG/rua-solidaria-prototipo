@@ -33,7 +33,9 @@
           <button onclick="mostrarDoacao()">Doar Agora</button>
           <button onclick="mostrarImpacto()">Valores Arrecadados</button>
             <% if (account){%>
-              <button onclick="mostrarImpacto()">pagina admins</button>
+                <% if(account.tipo == 1) { %>
+                  <button onclick="ir_para_pagina_de_admins()">pagina admins</button>
+                <%} %>
             <%} %>
         </div>
       </div>

@@ -1,0 +1,8 @@
+<main id="main-content">
+<div class="log-container">
+    <div class="log-title">System Logs</div>
+        <% for(const log of logs){ %>
+        <div class="log-entry"><%= log.time + log.message %></div>
+        <%} %>
+  </div>
+</main>

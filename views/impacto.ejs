@@ -20,13 +20,14 @@
     </div>
     <div class="padding"  style="margin: 20px;"><h2>Recente Doações dos usuarios:</h3></div>
     <div class="container-impacto">
-        <%  for(const user_profile of users.slice().reverse()) { %>
+        <%  for(const user_profile of users) { %>
             <div class="flex-item">
-                <img src=<%= "/imgs" + user_profile.picture%> class="block-image"></img>
+                <img src=<%= "/images" + user_profile.picture%> class="block-image"></img>
                 <h3><%= user_profile.name%></h3>
+                <p> <%= user_profile.description %> </p>
                 <p>doado:</p>
                 <div id="contador" class="contador">R$ <%= user_profile.value%></div>
-                <p> <%= user_profile.description %> </p>
+                <p> <%= user_profile.message%> </p>
             </div>
         <% } %>
     </div>
