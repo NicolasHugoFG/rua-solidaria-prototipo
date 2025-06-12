@@ -1,7 +1,7 @@
 node_modules/
-Dockerfile
+# Dockerfile
 adminer*
-init.sh
+# init.sh
 package
 .env
 
